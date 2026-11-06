@@ -1,0 +1,253 @@
+{
+  "experiments": [
+    {
+      "experiment": "baseline",
+      "device": "cpu",
+      "seed": 42,
+      "max_epochs": 20,
+      "epochs_run": 20,
+      "best_epoch": 19,
+      "batch_size": 128,
+      "augmentation": true,
+      "label_smoothing": 0.1,
+      "total_parameters": 1180490,
+      "trainable_parameters": 1180490,
+      "best_val_accuracy": 0.8822,
+      "test_accuracy": 0.8724,
+      "macro_f1": 0.8711477656392507,
+      "training_validation_seconds": 3275.85
+    },
+    {
+      "experiment": "baseline_matched",
+      "device": "cpu",
+      "seed": 42,
+      "max_epochs": 30,
+      "epochs_run": 30,
+      "best_epoch": 25,
+      "batch_size": 128,
+      "augmentation": true,
+      "label_smoothing": 0.1,
+      "total_parameters": 1180490,
+      "trainable_parameters": 1180490,
+      "best_val_accuracy": 0.9,
+      "test_accuracy": 0.8855,
+      "macro_f1": 0.8845572783101554,
+      "training_validation_seconds": 4536.66
+    },
+    {
+      "experiment": "resnet_se",
+      "device": "cpu",
+      "seed": 42,
+      "max_epochs": 30,
+      "epochs_run": 30,
+      "best_epoch": 28,
+      "batch_size": 128,
+      "augmentation": true,
+      "label_smoothing": 0.1,
+      "total_parameters": 2800130,
+      "trainable_parameters": 2800130,
+      "best_val_accuracy": 0.9264,
+      "test_accuracy": 0.9214,
+      "macro_f1": 0.9214284275563915,
+      "training_validation_seconds": 11891.2
+    },
+    {
+      "experiment": "resnet_se_noaug",
+      "device": "cpu",
+      "seed": 42,
+      "max_epochs": 30,
+      "epochs_run": 30,
+      "best_epoch": 27,
+      "batch_size": 128,
+      "augmentation": false,
+      "label_smoothing": 0.1,
+      "total_parameters": 2800130,
+      "trainable_parameters": 2800130,
+      "best_val_accuracy": 0.8844,
+      "test_accuracy": 0.879,
+      "macro_f1": 0.8787699241939946,
+      "training_validation_seconds": 10892.17
+    },
+    {
+      "experiment": "resnet_se_no_smoothing",
+      "device": "cpu",
+      "seed": 42,
+      "max_epochs": 30,
+      "epochs_run": 30,
+      "best_epoch": 30,
+      "batch_size": 128,
+      "augmentation": true,
+      "label_smoothing": 0.0,
+      "total_parameters": 2800130,
+      "trainable_parameters": 2800130,
+      "best_val_accuracy": 0.922,
+      "test_accuracy": 0.9173,
+      "macro_f1": 0.9173333412792986,
+      "training_validation_seconds": 11621.18
+    },
+    {
+      "experiment": "resnet_no_se",
+      "device": "cpu",
+      "seed": 42,
+      "max_epochs": 30,
+      "epochs_run": 30,
+      "best_epoch": 30,
+      "batch_size": 128,
+      "augmentation": true,
+      "label_smoothing": 0.1,
+      "total_parameters": 2777674,
+      "trainable_parameters": 2777674,
+      "best_val_accuracy": 0.9346,
+      "test_accuracy": 0.9232,
+      "macro_f1": 0.9232165650689754,
+      "training_validation_seconds": 10940.34
+    },
+    {
+      "experiment": "resnet18_transfer",
+      "device": "cpu",
+      "seed": 42,
+      "max_epochs": 15,
+      "epochs_run": 15,
+      "best_epoch": 15,
+      "batch_size": 64,
+      "augmentation": true,
+      "label_smoothing": 0.1,
+      "total_parameters": 11181642,
+      "trainable_parameters": 8398858,
+      "best_val_accuracy": 0.9324,
+      "test_accuracy": 0.9282,
+      "macro_f1": 0.9281845454951286,
+      "training_validation_seconds": 2564.95
+    },
+    {
+      "experiment": "gpu_resnet_seed42",
+      "device": "cuda",
+      "seed": 42,
+      "max_epochs": 30,
+      "epochs_run": 30,
+      "best_epoch": 27,
+      "batch_size": 128,
+      "augmentation": true,
+      "label_smoothing": 0.1,
+      "total_parameters": 2777674,
+      "trainable_parameters": 2777674,
+      "best_val_accuracy": 0.9298,
+      "test_accuracy": 0.9192,
+      "macro_f1": 0.9189797786024526,
+      "training_validation_seconds": 1163.97
+    }
+  ],
+  "selection_rule": "Highest validation accuracy among formal CPU experiments; pilot and GPU reproduction are reported separately.",
+  "selected_experiment": "resnet_no_se",
+  "selected_model_per_class": [
+    {
+      "class": "airplane",
+      "correct": 937,
+      "support": 1000,
+      "accuracy": 0.937
+    },
+    {
+      "class": "automobile",
+      "correct": 965,
+      "support": 1000,
+      "accuracy": 0.965
+    },
+    {
+      "class": "bird",
+      "correct": 888,
+      "support": 1000,
+      "accuracy": 0.888
+    },
+    {
+      "class": "cat",
+      "correct": 841,
+      "support": 1000,
+      "accuracy": 0.841
+    },
+    {
+      "class": "deer",
+      "correct": 933,
+      "support": 1000,
+      "accuracy": 0.933
+    },
+    {
+      "class": "dog",
+      "correct": 877,
+      "support": 1000,
+      "accuracy": 0.877
+    },
+    {
+      "class": "frog",
+      "correct": 942,
+      "support": 1000,
+      "accuracy": 0.942
+    },
+    {
+      "class": "horse",
+      "correct": 943,
+      "support": 1000,
+      "accuracy": 0.943
+    },
+    {
+      "class": "ship",
+      "correct": 954,
+      "support": 1000,
+      "accuracy": 0.954
+    },
+    {
+      "class": "truck",
+      "correct": 952,
+      "support": 1000,
+      "accuracy": 0.952
+    }
+  ],
+  "selected_model_top_confusions": [
+    {
+      "true_class": "cat",
+      "predicted_class": "dog",
+      "count": 70
+    },
+    {
+      "true_class": "dog",
+      "predicted_class": "cat",
+      "count": 69
+    },
+    {
+      "true_class": "bird",
+      "predicted_class": "deer",
+      "count": 27
+    },
+    {
+      "true_class": "cat",
+      "predicted_class": "deer",
+      "count": 27
+    },
+    {
+      "true_class": "automobile",
+      "predicted_class": "truck",
+      "count": 26
+    },
+    {
+      "true_class": "bird",
+      "predicted_class": "cat",
+      "count": 25
+    },
+    {
+      "true_class": "ship",
+      "predicted_class": "airplane",
+      "count": 24
+    },
+    {
+      "true_class": "truck",
+      "predicted_class": "automobile",
+      "count": 24
+    }
+  ],
+  "limitations": [
+    "Single-seed experiments; no statistical significance claim.",
+    "CPU and GPU runs use different PyTorch versions.",
+    "Pretrained model uses external ImageNet data, 96x96 inputs, and a different training budget.",
+    "Test losses with different label smoothing are not comparable.",
+    "Reported timings are descriptive, not controlled benchmarks."
+  ]
+}

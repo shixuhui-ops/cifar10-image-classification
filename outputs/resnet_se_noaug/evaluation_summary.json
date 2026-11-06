@@ -1,0 +1,11 @@
+{
+  "experiment": "resnet_se_noaug",
+  "model": "resnet_se",
+  "total_parameters": 2800130,
+  "trainable_parameters": 2800130,
+  "best_epoch": 27,
+  "best_val_accuracy": 0.8844,
+  "test_accuracy": 0.879,
+  "macro_f1": 0.8787699241939946,
+  "test_samples": 10000
+}

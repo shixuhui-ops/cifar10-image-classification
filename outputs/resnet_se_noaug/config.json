@@ -1,0 +1,29 @@
+{
+  "model": "resnet_se",
+  "data_dir": "data",
+  "output_dir": "outputs\\resnet_se_noaug",
+  "epochs": 30,
+  "batch_size": 128,
+  "lr": 0.001,
+  "weight_decay": 0.0005,
+  "label_smoothing": 0.1,
+  "patience": 8,
+  "seed": 42,
+  "num_workers": 0,
+  "no_augmentation": true,
+  "limit_batches": 0,
+  "device": "cpu",
+  "num_parameters": 2800130,
+  "class_names": [
+    "airplane",
+    "automobile",
+    "bird",
+    "cat",
+    "deer",
+    "dog",
+    "frog",
+    "horse",
+    "ship",
+    "truck"
+  ]
+}

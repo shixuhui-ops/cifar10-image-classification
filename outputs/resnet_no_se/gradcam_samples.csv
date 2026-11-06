@@ -1,0 +1,9 @@
+﻿test_index,true_class,predicted_class,confidence,correct
+3,airplane,airplane,0.726763904094696,True
+6,automobile,automobile,0.7876219749450684,True
+25,bird,bird,0.3948945105075836,True
+0,cat,cat,0.9474827647209167,True
+213,truck,ship,0.9749636650085449,False
+683,ship,airplane,0.9725973010063171,False
+2161,dog,cat,0.9721316695213318,False
+4615,dog,bird,0.9719454050064087,False

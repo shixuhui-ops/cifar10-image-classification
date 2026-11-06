@@ -1,0 +1,32 @@
+# Python 缓存和本地虚拟环境
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# 本地敏感配置
+.env
+.env.*
+
+# 数据集、安装包和模型权重
+data/
+downloads/
+checkpoints/
+*.pt
+*.pth
+*.ckpt
+*.whl
+*.aria2
+
+# 仅用于检查流程的实验
+outputs/*smoke*/
+
+# 临时文件和系统文件
+*.log
+~$*
+Thumbs.db
+.DS_Store
+
+# 含个人信息的报告配置和课程提交 PDF
+reports/report_info.json
+reports/experiment_report.pdf

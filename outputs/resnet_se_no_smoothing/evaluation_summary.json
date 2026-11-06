@@ -1,0 +1,11 @@
+{
+  "experiment": "resnet_se_no_smoothing",
+  "model": "resnet_se",
+  "total_parameters": 2800130,
+  "trainable_parameters": 2800130,
+  "best_epoch": 30,
+  "best_val_accuracy": 0.922,
+  "test_accuracy": 0.9173,
+  "macro_f1": 0.9173333412792986,
+  "test_samples": 10000
+}

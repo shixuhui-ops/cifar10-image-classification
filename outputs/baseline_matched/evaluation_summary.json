@@ -1,0 +1,11 @@
+{
+  "experiment": "baseline_matched",
+  "model": "baseline",
+  "total_parameters": 1180490,
+  "trainable_parameters": 1180490,
+  "best_epoch": 25,
+  "best_val_accuracy": 0.9,
+  "test_accuracy": 0.8855,
+  "macro_f1": 0.8845572783101554,
+  "test_samples": 10000
+}

@@ -1,0 +1,29 @@
+{
+  "model": "resnet",
+  "data_dir": "data",
+  "output_dir": "outputs\\gpu_resnet_seed42",
+  "epochs": 30,
+  "batch_size": 128,
+  "lr": 0.001,
+  "weight_decay": 0.0005,
+  "label_smoothing": 0.1,
+  "patience": 8,
+  "seed": 42,
+  "num_workers": 0,
+  "no_augmentation": false,
+  "limit_batches": 0,
+  "device": "cuda",
+  "num_parameters": 2777674,
+  "class_names": [
+    "airplane",
+    "automobile",
+    "bird",
+    "cat",
+    "deer",
+    "dog",
+    "frog",
+    "horse",
+    "ship",
+    "truck"
+  ]
+}

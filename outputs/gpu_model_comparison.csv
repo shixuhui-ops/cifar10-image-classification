@@ -1,0 +1,2 @@
+﻿experiment,model,total_parameters,trainable_parameters,best_epoch,best_val_accuracy,test_accuracy,macro_f1,test_samples
+gpu_resnet_seed42,resnet,2777674,2777674,27,0.9298,0.9192,0.9189797786024526,10000

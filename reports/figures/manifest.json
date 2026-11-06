@@ -1,0 +1,19 @@
+{
+  "experiment": "resnet_no_se",
+  "error_sample_indices": [
+    213,
+    683,
+    2161,
+    4615
+  ],
+  "gradcam_sample_indices": [
+    3,
+    2161
+  ],
+  "notes": [
+    "Metrics and curves use saved original evaluation records.",
+    "Grad-CAM is regenerated from the saved CPU-model checkpoint.",
+    "Error examples are selected by highest wrong-prediction confidence.",
+    "Grad-CAM maps are normalized separately."
+  ]
+}

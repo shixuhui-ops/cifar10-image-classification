@@ -1,0 +1,39 @@
+{
+  "data_dir": "data",
+  "output_dir": "outputs\\resnet18_transfer",
+  "epochs": 15,
+  "batch_size": 64,
+  "patience": 5,
+  "seed": 42,
+  "num_workers": 0,
+  "backbone_lr": 0.0001,
+  "head_lr": 0.001,
+  "limit_batches": 0,
+  "model": "resnet18_transfer",
+  "device": "cpu",
+  "num_parameters": 8398858,
+  "total_parameters": 11181642,
+  "class_names": [
+    "airplane",
+    "automobile",
+    "bird",
+    "cat",
+    "deer",
+    "dog",
+    "frog",
+    "horse",
+    "ship",
+    "truck"
+  ],
+  "pretrained_weights": "ResNet18_Weights.IMAGENET1K_V1",
+  "input_size": 96,
+  "trainable_layers": [
+    "layer4",
+    "fc"
+  ],
+  "label_smoothing": 0.1,
+  "weight_decay": 0.0005,
+  "val_ratio": 0.1,
+  "use_augmentation": true,
+  "is_smoke_test": false
+}

@@ -1,0 +1,7 @@
+{
+  "test_loss": 0.6894579115867615,
+  "test_accuracy": 0.9282,
+  "best_epoch": 15,
+  "best_val_accuracy": 0.9324,
+  "is_smoke_test": false
+}

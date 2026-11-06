@@ -1,0 +1,11 @@
+{
+  "experiment": "resnet18_transfer",
+  "model": "resnet18_transfer",
+  "total_parameters": 11181642,
+  "trainable_parameters": 8398858,
+  "best_epoch": 15,
+  "best_val_accuracy": 0.9324,
+  "test_accuracy": 0.9282,
+  "macro_f1": 0.9281845454951286,
+  "test_samples": 10000
+}

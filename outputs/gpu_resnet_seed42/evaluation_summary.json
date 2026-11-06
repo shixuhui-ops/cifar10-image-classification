@@ -1,0 +1,11 @@
+{
+  "experiment": "gpu_resnet_seed42",
+  "model": "resnet",
+  "total_parameters": 2777674,
+  "trainable_parameters": 2777674,
+  "best_epoch": 27,
+  "best_val_accuracy": 0.9298,
+  "test_accuracy": 0.9192,
+  "macro_f1": 0.9189797786024526,
+  "test_samples": 10000
+}
