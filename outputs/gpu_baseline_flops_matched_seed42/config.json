@@ -1,0 +1,30 @@
+{
+  "model": "baseline_flops_matched",
+  "data_dir": "data",
+  "output_dir": "outputs\\gpu_baseline_flops_matched_seed42",
+  "epochs": 30,
+  "batch_size": 128,
+  "lr": 0.001,
+  "weight_decay": 0.0005,
+  "label_smoothing": 0.1,
+  "patience": 8,
+  "seed": 42,
+  "num_workers": 0,
+  "no_augmentation": false,
+  "augmentation_policy": "all",
+  "limit_batches": 0,
+  "device": "cuda",
+  "num_parameters": 2882498,
+  "class_names": [
+    "airplane",
+    "automobile",
+    "bird",
+    "cat",
+    "deer",
+    "dog",
+    "frog",
+    "horse",
+    "ship",
+    "truck"
+  ]
+}

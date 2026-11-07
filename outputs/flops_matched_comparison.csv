@@ -1,0 +1,4 @@
+﻿experiment,model,total_parameters,trainable_parameters,best_epoch,best_val_accuracy,test_accuracy,macro_f1,test_samples
+gpu_baseline_flops_matched_seed42,baseline_flops_matched,2882498,2882498,30,0.9206,0.9085,0.9082144422364753,10000
+gpu_baseline_flops_matched_seed43,baseline_flops_matched,2882498,2882498,27,0.9144,0.9099,0.9095079854017625,10000
+gpu_baseline_flops_matched_seed44,baseline_flops_matched,2882498,2882498,26,0.9142,0.9085,0.9079994111487906,10000

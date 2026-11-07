@@ -1,0 +1,161 @@
+{
+  "group_summary": {
+    "resnet_no_se": {
+      "n": 3,
+      "mean": 0.9206666666666666,
+      "std": 0.0015567059238447464,
+      "ci95_low": 0.9167995947751387,
+      "ci95_high": 0.9245337385581945,
+      "ci95_half_width": 0.003867071891527872
+    },
+    "resnet_se": {
+      "n": 3,
+      "mean": 0.9149666666666668,
+      "std": 0.0029365512652315597,
+      "ci95_low": 0.907671868926217,
+      "ci95_high": 0.9222614644071166,
+      "ci95_half_width": 0.007294797740449863
+    },
+    "resnet_se_no_smoothing": {
+      "n": 3,
+      "mean": 0.9136333333333333,
+      "std": 0.0016623276853055438,
+      "ci95_low": 0.9095038824409791,
+      "ci95_high": 0.9177627842256875,
+      "ci95_half_width": 0.0041294508923541366
+    },
+    "augmentation_all": {
+      "n": 1,
+      "mean": 0.9192,
+      "std": 0.0,
+      "ci95_low": 0.9192,
+      "ci95_high": 0.9192,
+      "ci95_half_width": 0.0
+    },
+    "augmentation_crop": {
+      "n": 3,
+      "mean": 0.9055,
+      "std": 0.0009000000000000119,
+      "ci95_low": 0.9032642760594246,
+      "ci95_high": 0.9077357239405753,
+      "ci95_half_width": 0.0022357239405753266
+    },
+    "augmentation_flip": {
+      "n": 3,
+      "mean": 0.9047,
+      "std": 0.003651027252705753,
+      "ci95_low": 0.8956303455149254,
+      "ci95_high": 0.9137696544850745,
+      "ci95_half_width": 0.009069654485074562
+    },
+    "augmentation_color": {
+      "n": 3,
+      "mean": 0.8756666666666667,
+      "std": 0.002010804150914099,
+      "ci95_low": 0.8706715522444369,
+      "ci95_high": 0.8806617810888965,
+      "ci95_half_width": 0.0049951144222298155
+    },
+    "augmentation_none": {
+      "n": 3,
+      "mean": 0.8760666666666667,
+      "std": 0.0024006943440041412,
+      "ci95_low": 0.8701030113123402,
+      "ci95_high": 0.8820303220209931,
+      "ci95_half_width": 0.005963655354326408
+    }
+  },
+  "paired_comparisons": [
+    {
+      "n": 3,
+      "ci95_low": 0.0020238118962220787,
+      "ci95_high": 0.009376188103777924,
+      "comparison": "resnet_no_se - resnet_se",
+      "seeds": [
+        42,
+        43,
+        44
+      ],
+      "mean_difference": 0.005700000000000001,
+      "difference_ci95_low": 0.0020238118962220787,
+      "difference_ci95_high": 0.009376188103777924,
+      "t_statistic": 6.671345390179604,
+      "p_value": 0.02173849010714329
+    },
+    {
+      "n": 3,
+      "ci95_low": -0.0021826942749839902,
+      "ci95_high": 0.00484936094165066,
+      "comparison": "resnet_se_smoothing - resnet_se_no_smoothing",
+      "seeds": [
+        42,
+        43,
+        44
+      ],
+      "mean_difference": 0.0013333333333333346,
+      "difference_ci95_low": -0.0021826942749839902,
+      "difference_ci95_high": 0.00484936094165066,
+      "t_statistic": 1.631634032896042,
+      "p_value": 0.24434088406188936
+    },
+    {
+      "n": 3,
+      "ci95_low": 0.025487279731145507,
+      "ci95_high": 0.033379386935521116,
+      "comparison": "augmentation_crop - augmentation_none",
+      "seeds": [
+        42,
+        43,
+        44
+      ],
+      "mean_difference": 0.02943333333333331,
+      "difference_ci95_low": 0.025487279731145507,
+      "difference_ci95_high": 0.033379386935521116,
+      "t_statistic": 32.09318087875916,
+      "p_value": 0.0009694882498740402
+    },
+    {
+      "n": 3,
+      "ci95_low": 0.02025573465924068,
+      "ci95_high": 0.03701093200742597,
+      "comparison": "augmentation_flip - augmentation_none",
+      "seeds": [
+        42,
+        43,
+        44
+      ],
+      "mean_difference": 0.028633333333333327,
+      "difference_ci95_low": 0.02025573465924068,
+      "difference_ci95_high": 0.03701093200742597,
+      "t_statistic": 14.705799910119982,
+      "p_value": 0.0045922242558998185
+    },
+    {
+      "n": 3,
+      "ci95_low": -0.010868805922162236,
+      "ci95_high": 0.010068805922162251,
+      "comparison": "augmentation_color - augmentation_none",
+      "seeds": [
+        42,
+        43,
+        44
+      ],
+      "mean_difference": -0.00039999999999999297,
+      "difference_ci95_low": -0.010868805922162236,
+      "difference_ci95_high": 0.010068805922162251,
+      "t_statistic": -0.16439898730535296,
+      "p_value": 0.8845299461620778
+    }
+  ],
+  "method": {
+    "confidence_level": 0.95,
+    "test": "paired t-test",
+    "standard_deviation": "sample standard deviation"
+  },
+  "limitations": [
+    "Each comparison uses only three seeds.",
+    "The paired t-test has low statistical power at n=3.",
+    "Results should be described as exploratory evidence.",
+    "The all-augmentation condition currently has only seed=42."
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "experiment": "gpu_baseline_flops_matched_seed43",
+  "model": "baseline_flops_matched",
+  "total_parameters": 2882498,
+  "trainable_parameters": 2882498,
+  "best_epoch": 27,
+  "best_val_accuracy": 0.9144,
+  "test_accuracy": 0.9099,
+  "macro_f1": 0.9095079854017625,
+  "test_samples": 10000
+}

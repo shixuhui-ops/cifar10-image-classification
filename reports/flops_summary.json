@@ -1,0 +1,62 @@
+{
+  "baseline": {
+    "trainable_parameters": 1180490,
+    "flops": 305596928,
+    "gflops": 0.305596928,
+    "input_shape": [
+      1,
+      3,
+      32,
+      32
+    ],
+    "counting_rule": "Conv2d and Linear multiply-add operations; one multiply-add counted as two FLOPs."
+  },
+  "baseline_wide": {
+    "trainable_parameters": 2799362,
+    "flops": 702939296,
+    "gflops": 0.702939296,
+    "input_shape": [
+      1,
+      3,
+      32,
+      32
+    ],
+    "counting_rule": "Conv2d and Linear multiply-add operations; one multiply-add counted as two FLOPs."
+  },
+  "resnet": {
+    "trainable_parameters": 2777674,
+    "flops": 842404864,
+    "gflops": 0.842404864,
+    "input_shape": [
+      1,
+      3,
+      32,
+      32
+    ],
+    "counting_rule": "Conv2d and Linear multiply-add operations; one multiply-add counted as two FLOPs."
+  },
+  "resnet_se": {
+    "trainable_parameters": 2800130,
+    "flops": 842447872,
+    "gflops": 0.842447872,
+    "input_shape": [
+      1,
+      3,
+      32,
+      32
+    ],
+    "counting_rule": "Conv2d and Linear multiply-add operations; one multiply-add counted as two FLOPs."
+  },
+  "baseline_flops_matched": {
+    "trainable_parameters": 2882498,
+    "flops": 872808608,
+    "gflops": 0.872808608,
+    "input_shape": [
+      1,
+      3,
+      32,
+      32
+    ],
+    "counting_rule": "Conv2d and Linear multiply-add operations; one multiply-add counted as two FLOPs."
+  }
+}

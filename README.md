@@ -614,3 +614,72 @@ SE 模型在三个种子上均低于无 SE 残差网络，平均低 0.57 个百�
 - `outputs/gpu_baseline_wide_seed44`
 
 上述新增实验均使用独立 GPU 环境，不能与 CPU 实验直接作为纯硬件对照。多随机种子结果报告均值和样本标准差，但未进行显著性检验。
+
+## 15. 稳健性统计、计算量控制与断点恢复
+
+### 15.1 置信区间与配对检验
+
+三种子结果使用样本标准差和 95% t 置信区间，并按相同 seed 进行配对 t 检验。
+
+| 比较 | 平均差异 | 95% CI | p 值 |
+|---|---:|---:|---:|
+| 无 SE - SE | +0.57 个百分点 | [+0.20%, +0.94%] | 0.0217 |
+| SE 标签平滑 - 无标签平滑 | +0.13 个百分点 | [-0.22%, +0.48%] | 0.2443 |
+| RandomCrop - 无增强 | +2.94 个百分点 | [+2.55%, +3.34%] | 0.0010 |
+| RandomHorizontalFlip - 无增强 | +2.86 个百分点 | [+2.03%, +3.70%] | 0.0046 |
+| ColorJitter - 无增强 | -0.04 个百分点 | [-1.09%, +1.01%] | 0.8845 |
+
+由于每组只有三个随机种子，统计检验仅作为探索性证据，不能替代大规模重复实验。
+
+结果文件：
+
+- `reports/statistical_analysis.json`
+- `src/analyze_robustness.py`
+
+### 15.2 FLOPs 控制
+
+FLOPs 按 32×32 输入、Conv2d 和 Linear 的乘加运算统计，一个乘加计为 2 FLOPs。
+
+| 模型 | 参数量 | FLOPs |
+|---|---:|---:|
+| 无 SE 残差网络 | 2,777,674 | 0.8424 GFLOPs |
+| FLOPs 匹配 CNN | 2,882,498 | 0.8728 GFLOPs |
+
+FLOPs 匹配 CNN 与残差网络的参数量差异约 3.8%，FLOPs 差异约 3.6%。
+
+三种子结果：
+
+| 模型 | 测试准确率均值 | 样本标准差 |
+|---|---:|---:|
+| 无 SE 残差网络 | 92.07% | 0.16% |
+| FLOPs 匹配 CNN | 90.90% | 0.08% |
+
+在参数量和计算量都接近时，残差网络仍平均高 1.17 个百分点。
+
+结果文件：
+
+- `reports/flops_summary.json`
+- `reports/flops_matched_multiseed_runs.csv`
+- `src/measure_flops.py`
+
+### 15.3 断点恢复
+
+新增 `src/resume_train.py`，支持从 `last_model.pt` 恢复：
+
+- 模型参数；
+- 优化器状态；
+- 学习率调度器状态；
+- 已完成轮数；
+- 最佳验证准确率；
+- 训练历史；
+- 早停状态。
+
+恢复训练示例：
+
+```powershell
+python .\src\resume_train.py `
+    --resume outputs\resnet\last_model.pt `
+    --epochs 30 `
+    --output-dir outputs\resnet
+
+已通过两轮冒烟测试，第二次运行从第 2 轮继续，未重新从第 1 轮开始。

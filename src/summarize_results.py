@@ -29,6 +29,9 @@ EXPERIMENTS = [
     "gpu_baseline_wide_seed42",
     "gpu_baseline_wide_seed43",
     "gpu_baseline_wide_seed44",
+    "gpu_baseline_flops_matched_seed42",
+    "gpu_baseline_flops_matched_seed43",
+    "gpu_baseline_flops_matched_seed44",
 ]
 
 
@@ -252,6 +255,16 @@ def main():
                 "gpu_baseline_wide_seed42",
                 "gpu_baseline_wide_seed43",
                 "gpu_baseline_wide_seed44",
+            }
+        ],
+        "gpu_baseline_flops_matched": [
+            row
+            for row in rows
+            if row["experiment"]
+            in {
+                "gpu_baseline_flops_matched_seed42",
+                "gpu_baseline_flops_matched_seed43",
+                "gpu_baseline_flops_matched_seed44",
             }
         ],
     }

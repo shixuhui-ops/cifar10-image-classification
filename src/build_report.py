@@ -624,17 +624,16 @@ def main():
 
     report.heading("7　独立思考、局限与结论")
     report.paragraph(
-        "① 数据增强拆分实验显示，RandomCrop 和 RandomHorizontalFlip "
-        "分别带来约 3 个百分点收益，ColorJitter 单独使用时未带来收益，"
-        "三者组合达到最高结果。"
-        f"② 三种子实验中，无 SE 残差网络为 "
-        f"{percentage(no_se_stats['mean_test_accuracy'])} "
-        f"± {percentage(no_se_stats['std_test_accuracy'])}，"
-        f"SE 网络为 {percentage(se_stats['mean_test_accuracy'])} "
-        f"± {percentage(se_stats['std_test_accuracy'])}，"
-        "当前设置下注意力收益不稳定。"
-        "③ 参数量匹配对照支持残差结构本身具有额外作用。"
-        "④ 实验仍未进行正式显著性检验，后续可增加更多种子和置信区间分析。",
+        "① 数据增强拆分实验显示，RandomCrop 和 "
+        "RandomHorizontalFlip 相对无增强分别提高约 2.94 和 2.86 个百分点，"
+        "ColorJitter 单独使用时没有显著收益。"
+        "② 三种子配对检验中，无 SE 相对 SE 平均提高 0.57 个百分点，"
+        "95% CI 为 [+0.20%, +0.94%]，p=0.0217；"
+        "标签平滑提升为 0.13 个百分点，p=0.2443。"
+        "③ 参数量和 FLOPs 均接近的 CNN 测试准确率为 90.90%，"
+        "无 SE 残差网络为 92.07%，说明残差连接具有额外作用。"
+        "④ 已实现从 last_model.pt 恢复模型、优化器、调度器和训练历史，"
+        "但当前统计实验仍只有三个随机种子，结论应视为探索性证据。",
         "small",
     )
     report.paragraph(

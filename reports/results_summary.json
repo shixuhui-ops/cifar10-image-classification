@@ -413,6 +413,60 @@
       "test_accuracy": 0.9089,
       "macro_f1": 0.9083903910800499,
       "training_validation_seconds": 971.47
+    },
+    {
+      "experiment": "gpu_baseline_flops_matched_seed42",
+      "device": "cuda",
+      "seed": 42,
+      "max_epochs": 30,
+      "epochs_run": 30,
+      "best_epoch": 30,
+      "batch_size": 128,
+      "augmentation": true,
+      "augmentation_policy": "all",
+      "label_smoothing": 0.1,
+      "total_parameters": 2882498,
+      "trainable_parameters": 2882498,
+      "best_val_accuracy": 0.9206,
+      "test_accuracy": 0.9085,
+      "macro_f1": 0.9082144422364753,
+      "training_validation_seconds": 1162.03
+    },
+    {
+      "experiment": "gpu_baseline_flops_matched_seed43",
+      "device": "cuda",
+      "seed": 43,
+      "max_epochs": 30,
+      "epochs_run": 30,
+      "best_epoch": 27,
+      "batch_size": 128,
+      "augmentation": true,
+      "augmentation_policy": "all",
+      "label_smoothing": 0.1,
+      "total_parameters": 2882498,
+      "trainable_parameters": 2882498,
+      "best_val_accuracy": 0.9144,
+      "test_accuracy": 0.9099,
+      "macro_f1": 0.9095079854017625,
+      "training_validation_seconds": 1134.15
+    },
+    {
+      "experiment": "gpu_baseline_flops_matched_seed44",
+      "device": "cuda",
+      "seed": 44,
+      "max_epochs": 30,
+      "epochs_run": 30,
+      "best_epoch": 26,
+      "batch_size": 128,
+      "augmentation": true,
+      "augmentation_policy": "all",
+      "label_smoothing": 0.1,
+      "total_parameters": 2882498,
+      "trainable_parameters": 2882498,
+      "best_val_accuracy": 0.9142,
+      "test_accuracy": 0.9085,
+      "macro_f1": 0.9079994111487906,
+      "training_validation_seconds": 1138.87
     }
   ],
   "selection_rule": "Highest validation accuracy among formal CPU experiments; pilot and GPU experiments are reported separately.",
@@ -541,6 +595,11 @@
       "seeds": 3,
       "mean_test_accuracy": 0.9073333333333333,
       "std_test_accuracy": 0.0019139836293274326
+    },
+    "gpu_baseline_flops_matched": {
+      "seeds": 3,
+      "mean_test_accuracy": 0.9089666666666667,
+      "std_test_accuracy": 0.0008082903768655152
     }
   },
   "limitations": [

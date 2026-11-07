@@ -89,7 +89,13 @@ def parse_args():
         "--model",
         type=str,
         default="resnet_se",
-        choices=["baseline", "baseline_wide", "resnet", "resnet_se"],
+        choices=[
+    "baseline",
+    "baseline_wide",
+    "baseline_flops_matched",
+    "resnet",
+    "resnet_se",
+],
     )
     parser.add_argument("--data-dir", type=str, default="data")
     parser.add_argument(
