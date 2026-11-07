@@ -1,0 +1,11 @@
+{
+  "experiment": "gpu_baseline_wide_seed44",
+  "model": "baseline_wide",
+  "total_parameters": 2799362,
+  "trainable_parameters": 2799362,
+  "best_epoch": 30,
+  "best_val_accuracy": 0.9124,
+  "test_accuracy": 0.9089,
+  "macro_f1": 0.9083903910800499,
+  "test_samples": 10000
+}

@@ -57,6 +57,41 @@ class BaselineCNN(nn.Module):
         x = self.features(x)
         return self.classifier(x)
 
+class WideBaselineCNN(nn.Module):
+    """参数量接近残差网络的加宽 CNN 对照模型。"""
+
+    def __init__(self, num_classes=10):
+        super().__init__()
+
+        self.features = nn.Sequential(
+            ConvBNAct(3, 96),
+            ConvBNAct(96, 96),
+            nn.MaxPool2d(2),
+            nn.Dropout2d(0.10),
+
+            ConvBNAct(96, 192),
+            ConvBNAct(192, 192),
+            nn.MaxPool2d(2),
+            nn.Dropout2d(0.15),
+
+            ConvBNAct(192, 400),
+            ConvBNAct(400, 400),
+            nn.MaxPool2d(2),
+            nn.Dropout2d(0.20),
+        )
+
+        self.classifier = nn.Sequential(
+            nn.AdaptiveAvgPool2d(1),
+            nn.Flatten(),
+            nn.Linear(400, 200),
+            nn.ReLU(inplace=True),
+            nn.Dropout(0.40),
+            nn.Linear(200, num_classes),
+        )
+
+    def forward(self, x):
+        x = self.features(x)
+        return self.classifier(x)
 
 class SEBlock(nn.Module):
     """Squeeze-and-Excitation 通道注意力模块。"""
@@ -248,6 +283,9 @@ def build_model(name="resnet_se", num_classes=10):
 
     if model_name == "baseline":
         return BaselineCNN(num_classes=num_classes)
+
+    if model_name == "baseline_wide":
+        return WideBaselineCNN(num_classes=num_classes)
 
     if model_name == "resnet":
         model = ImprovedResNetSE(num_classes=num_classes)

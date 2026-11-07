@@ -61,13 +61,18 @@ def run_epoch(
 
         batch_size = labels.size(0)
         total_loss += loss.item() * batch_size
-        total_correct += (logits.argmax(dim=1) == labels).sum().item()
+        total_correct += (
+            logits.argmax(dim=1) == labels
+        ).sum().item()
         total_samples += batch_size
 
     if total_samples == 0:
         raise RuntimeError("当前 DataLoader 没有产生任何样本。")
 
-    return total_loss / total_samples, total_correct / total_samples
+    return (
+        total_loss / total_samples,
+        total_correct / total_samples,
+    )
 
 
 def save_json(path: Path, data):
@@ -84,10 +89,14 @@ def parse_args():
         "--model",
         type=str,
         default="resnet_se",
-        choices=["baseline", "resnet", "resnet_se"],
+        choices=["baseline", "baseline_wide", "resnet", "resnet_se"],
     )
     parser.add_argument("--data-dir", type=str, default="data")
-    parser.add_argument("--output-dir", type=str, default="outputs/resnet_se")
+    parser.add_argument(
+        "--output-dir",
+        type=str,
+        default="outputs/resnet_se",
+    )
     parser.add_argument("--epochs", type=int, default=30)
     parser.add_argument("--batch-size", type=int, default=128)
     parser.add_argument("--lr", type=float, default=3e-4)
@@ -96,10 +105,21 @@ def parse_args():
     parser.add_argument("--patience", type=int, default=8)
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--num-workers", type=int, default=0)
-    parser.add_argument("--no-augmentation", action="store_true")
-
-    # 仅用于快速检查代码，正式训练时保持默认值 0。
-    parser.add_argument("--limit-batches", type=int, default=0)
+    parser.add_argument(
+        "--no-augmentation",
+        action="store_true",
+    )
+    parser.add_argument(
+        "--augmentation-policy",
+        type=str,
+        choices=["none", "crop", "flip", "color", "all"],
+        default=None,
+    )
+    parser.add_argument(
+        "--limit-batches",
+        type=int,
+        default=0,
+    )
 
     return parser.parse_args()
 
@@ -111,15 +131,25 @@ def main():
     output_dir = Path(args.output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
 
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    device = torch.device(
+        "cuda" if torch.cuda.is_available() else "cpu"
+    )
     print(f"device: {device}")
+
+    augmentation_policy = args.augmentation_policy
+
+    if augmentation_policy is None:
+        augmentation_policy = (
+            "none" if args.no_augmentation else "all"
+        )
 
     loaders, class_names = create_dataloaders(
         data_dir=args.data_dir,
         batch_size=args.batch_size,
         seed=args.seed,
         num_workers=args.num_workers,
-        use_augmentation=not args.no_augmentation,
+        use_augmentation=augmentation_policy != "none",
+        augmentation_policy=augmentation_policy,
     )
 
     model = build_model(
@@ -146,6 +176,8 @@ def main():
     config["device"] = str(device)
     config["num_parameters"] = count_parameters(model)
     config["class_names"] = class_names
+    config["augmentation_policy"] = augmentation_policy
+
     save_json(output_dir / "config.json", config)
 
     history = []
@@ -188,6 +220,7 @@ def main():
             "val_accuracy": val_accuracy,
             "elapsed_seconds": elapsed,
         }
+
         history.append(epoch_result)
         save_json(output_dir / "history.json", history)
 
@@ -211,7 +244,11 @@ def main():
             "history": history,
             "config": config,
         }
-        torch.save(checkpoint, output_dir / "last_model.pt")
+
+        torch.save(
+            checkpoint,
+            output_dir / "last_model.pt",
+        )
 
         if val_accuracy > best_val_accuracy:
             best_val_accuracy = val_accuracy
@@ -219,7 +256,11 @@ def main():
             epochs_without_improvement = 0
 
             checkpoint["best_val_accuracy"] = best_val_accuracy
-            torch.save(checkpoint, output_dir / "best_model.pt")
+
+            torch.save(
+                checkpoint,
+                output_dir / "best_model.pt",
+            )
             print("  saved new best model")
         else:
             epochs_without_improvement += 1
@@ -232,6 +273,7 @@ def main():
             break
 
     best_checkpoint_path = output_dir / "best_model.pt"
+
     best_checkpoint = torch.load(
         best_checkpoint_path,
         map_location=device,
@@ -252,8 +294,13 @@ def main():
         "test_accuracy": test_accuracy,
         "best_epoch": best_epoch,
         "best_val_accuracy": best_val_accuracy,
+        "augmentation_policy": augmentation_policy,
     }
-    save_json(output_dir / "test_metrics.json", test_metrics)
+
+    save_json(
+        output_dir / "test_metrics.json",
+        test_metrics,
+    )
 
     print(
         f"test loss: {test_loss:.4f} | "

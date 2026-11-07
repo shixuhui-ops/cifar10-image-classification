@@ -277,6 +277,27 @@ def main():
     nosmooth = experiments["resnet_se_no_smoothing"]
     transfer = experiments["resnet18_transfer"]
     gpu_result = experiments["gpu_resnet_seed42"]
+    multiseed = summary["multiseed_summary"]
+
+    no_se_stats = multiseed["gpu_resnet_no_se"]
+    se_stats = multiseed["gpu_resnet_se"]
+    no_smoothing_stats = multiseed[
+        "gpu_resnet_se_no_smoothing"
+    ]
+    wide_baseline_stats = multiseed["gpu_baseline_wide"]
+
+    augmentation_rows = {
+        row["augmentation_policy"]: row
+        for row in summary["experiments"]
+        if row["experiment"]
+        in {
+            "gpu_resnet_seed42",
+            "gpu_resnet_crop_seed42",
+            "gpu_resnet_flip_seed42",
+            "gpu_resnet_color_seed42",
+            "gpu_resnet_none_seed42",
+        }
+    }
 
     architecture_gain = (
         main_result["test_accuracy"] - baseline["test_accuracy"]
@@ -453,16 +474,32 @@ def main():
 
     report.heading("3.1　消融结论与比较边界")
     report.paragraph(
-        f"数据增强：SE 模型由 {percentage(noaug['test_accuracy'])} 提升至 "
-        f"{percentage(se['test_accuracy'])}，增加 {augmentation_gain:.2f} 个百分点，"
-        "是本组消融中收益最明显的因素。"
-        f"标签平滑增加 {smoothing_gain:.2f} 个百分点。"
-        f"SE 相对无 SE 变化为 {attention_change:+.2f} 个百分点，"
-        "不能预设注意力必然提升性能。"
+        f"三随机种子结果显示，无 SE 残差网络为 "
+        f"{percentage(no_se_stats['mean_test_accuracy'])}"
+        f" ± {percentage(no_se_stats['std_test_accuracy'])}，"
+        f"SE 残差网络为 "
+        f"{percentage(se_stats['mean_test_accuracy'])}"
+        f" ± {percentage(se_stats['std_test_accuracy'])}。"
+        f"SE 平均低 "
+        f"{100 * (no_se_stats['mean_test_accuracy'] - se_stats['mean_test_accuracy']):.2f}"
+        " 个百分点，当前设置下未观察到稳定收益。"
+        f"标签平滑相对无标签平滑平均提高 "
+        f"{100 * (se_stats['mean_test_accuracy'] - no_smoothing_stats['mean_test_accuracy']):.2f}"
+        " 个百分点，提升幅度较小。"
     )
     report.paragraph(
-        "架构对比控制最大轮数和主要训练设置，但没有控制参数量和 FLOPs："
-        "残差网络参数约为 CNN 的 2.35 倍，因此不能把全部收益单独归因于残差连接。"
+        f"参数量匹配的加宽 CNN 有 "
+        f"{experiments['gpu_baseline_wide_seed42']['total_parameters']:,} "
+        "个参数，与无 SE 残差网络的参数量相差约 0.8%。"
+        f"三种子结果中，加宽 CNN 为 "
+        f"{percentage(wide_baseline_stats['mean_test_accuracy'])}"
+        f" ± {percentage(wide_baseline_stats['std_test_accuracy'])}，"
+        f"无 SE 残差网络为 "
+        f"{percentage(no_se_stats['mean_test_accuracy'])}"
+        f" ± {percentage(no_se_stats['std_test_accuracy'])}，"
+        f"残差网络平均高 "
+        f"{100 * (no_se_stats['mean_test_accuracy'] - wide_baseline_stats['mean_test_accuracy']):.2f}"
+        " 个百分点，说明差异不能仅由参数量解释。"
         "迁移学习引入额外 ImageNet 数据且预算不同，只作为扩展实验。"
         "不同标签平滑系数的 loss 不宜直接比较。",
         "small",
@@ -587,12 +624,17 @@ def main():
 
     report.heading("7　独立思考、局限与结论")
     report.paragraph(
-        "① 数据增强收益较大，但注意力和损失改进收益较小或未带来收益，"
-        "因此应通过消融而非模块数量评价方案。"
-        "② 所有正式实验仅运行 seed=42，没有多种子均值、标准差或显著性检验。"
-        f"③ GPU 复现测试准确率为 {percentage(gpu_result['test_accuracy'])}，"
-        "因框架版本也不同，不能当作纯设备对照或第二随机种子重复实验。"
-        "④ 后续应固定环境，开展多种子、等参数量对照，并验证细粒度特征与校准策略。",
+        "① 数据增强拆分实验显示，RandomCrop 和 RandomHorizontalFlip "
+        "分别带来约 3 个百分点收益，ColorJitter 单独使用时未带来收益，"
+        "三者组合达到最高结果。"
+        f"② 三种子实验中，无 SE 残差网络为 "
+        f"{percentage(no_se_stats['mean_test_accuracy'])} "
+        f"± {percentage(no_se_stats['std_test_accuracy'])}，"
+        f"SE 网络为 {percentage(se_stats['mean_test_accuracy'])} "
+        f"± {percentage(se_stats['std_test_accuracy'])}，"
+        "当前设置下注意力收益不稳定。"
+        "③ 参数量匹配对照支持残差结构本身具有额外作用。"
+        "④ 实验仍未进行正式显著性检验，后续可增加更多种子和置信区间分析。",
         "small",
     )
     report.paragraph(

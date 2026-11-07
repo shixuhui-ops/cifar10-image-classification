@@ -545,3 +545,72 @@ CPU 环境下则使用 --name cpu。
 输出保存在 reports/figures/。
 
 缺少模型权重时，不需要执行此命令，直接使用仓库现有图片即可。
+
+## 14. 新增稳健性与控制变量实验
+
+### 14.1 三随机种子实验
+
+GPU 环境下使用 seed=42、43、44，训练设置保持一致。
+
+| 模型 | 测试准确率均值 | 样本标准差 |
+|---|---:|---:|
+| 无 SE 残差网络 | 92.07% | 0.16% |
+| SE 残差网络 | 91.50% | 0.29% |
+| SE 残差网络，无标签平滑 | 91.36% | 0.17% |
+
+SE 模型在三个种子上均低于无 SE 残差网络，平均低 0.57 个百分点。当前设置下未观察到 SE 的稳定收益。
+
+标签平滑相对于无标签平滑的平均提升为 0.13 个百分点，但提升幅度较小，不能据此宣称具有普遍有效性。
+
+完整逐次实验记录：
+
+- `reports/multiseed_runs.csv`
+- `outputs/gpu_resnet_seed42`
+- `outputs/gpu_resnet_seed43`
+- `outputs/gpu_resnet_seed44`
+- `outputs/gpu_resnet_se_seed42`
+- `outputs/gpu_resnet_se_seed43`
+- `outputs/gpu_resnet_se_seed44`
+- `outputs/gpu_resnet_se_no_smoothing_seed42`
+- `outputs/gpu_resnet_se_no_smoothing_seed43`
+- `outputs/gpu_resnet_se_no_smoothing_seed44`
+
+### 14.2 数据增强拆分实验
+
+固定无 SE 残差网络和 seed=42，分别比较单独增强策略。
+
+| 增强策略 | 测试准确率 | 相对无增强 |
+|---|---:|---:|
+| 无增强 | 87.51% | 0.00 个百分点 |
+| 仅 ColorJitter | 87.51% | 0.00 个百分点 |
+| 仅 RandomCrop | 90.55% | +3.04 个百分点 |
+| 仅 RandomHorizontalFlip | 90.76% | +3.25 个百分点 |
+| 三者组合 | 91.92% | +4.41 个百分点 |
+
+该实验为单随机种子探索性结果。完整记录见：
+
+- `reports/augmentation_policy_summary.csv`
+- `outputs/gpu_resnet_crop_seed42`
+- `outputs/gpu_resnet_flip_seed42`
+- `outputs/gpu_resnet_color_seed42`
+- `outputs/gpu_resnet_none_seed42`
+
+### 14.3 参数量匹配的架构对照
+
+新增 `baseline_wide` CNN，使其参数量接近无 SE 残差网络：
+
+| 模型 | 参数量 | 测试准确率均值 | 样本标准差 |
+|---|---:|---:|---:|
+| 无 SE 残差网络 | 2,777,674 | 92.07% | 0.16% |
+| 参数量匹配 CNN | 2,799,362 | 90.73% | 0.19% |
+
+参数量相差约 0.8%，但残差网络平均高 1.33 个百分点，说明性能差异不能仅由参数量解释。
+
+完整记录见：
+
+- `reports/architecture_multiseed_runs.csv`
+- `outputs/gpu_baseline_wide_seed42`
+- `outputs/gpu_baseline_wide_seed43`
+- `outputs/gpu_baseline_wide_seed44`
+
+上述新增实验均使用独立 GPU 环境，不能与 CPU 实验直接作为纯硬件对照。多随机种子结果报告均值和样本标准差，但未进行显著性检验。
