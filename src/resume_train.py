@@ -1,3 +1,5 @@
+import shutil
+from rng_state import capture_rng_state, restore_rng_state
 import argparse
 import json
 import random
@@ -99,7 +101,17 @@ def main():
         else resume_path.parent
     )
     output_dir.mkdir(parents=True, exist_ok=True)
+    original_best_path = resume_path.parent / "best_model.pt"
+    resumed_best_path = output_dir / "best_model.pt"
 
+    if not original_best_path.is_file():
+        raise FileNotFoundError(
+            f"原实验目录缺少最佳模型：{original_best_path}。"
+            "恢复训练需要同时保留 last_model.pt 和 best_model.pt。"
+        )
+
+    if original_best_path.resolve() != resumed_best_path.resolve():
+        shutil.copy2(original_best_path, resumed_best_path)
     seed = int(saved_config.get("seed", 42))
     set_seed(seed)
 
@@ -200,7 +212,13 @@ def main():
         f"best epoch: {best_epoch}; "
         f"best validation accuracy: {best_val_accuracy:.4f}"
     )
+    rng_state = checkpoint.get("rng_state")
 
+    if rng_state is not None:
+        restore_rng_state(rng_state)
+        print("随机状态已恢复")
+    else:
+        print("旧检查点未保存随机状态，按原有方式恢复")
     for epoch in range(start_epoch, args.epochs + 1):
         start_time = time.time()
 
@@ -258,6 +276,7 @@ def main():
             "epochs_without_improvement": stale_epochs,
             "history": history,
             "config": config,
+            "rng_state": capture_rng_state(),
         }
 
         torch.save(

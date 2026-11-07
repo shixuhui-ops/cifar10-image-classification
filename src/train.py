@@ -1,3 +1,4 @@
+from rng_state import capture_rng_state
 import argparse
 import json
 import random
@@ -240,6 +241,15 @@ def main():
             f"time {elapsed:.1f}s"
         )
 
+        improved = val_accuracy > best_val_accuracy
+
+        if improved:
+            best_val_accuracy = val_accuracy
+            best_epoch = epoch
+            epochs_without_improvement = 0
+        else:
+            epochs_without_improvement += 1
+
         checkpoint = {
             "epoch": epoch,
             "model_name": args.model,
@@ -247,8 +257,11 @@ def main():
             "optimizer_state": optimizer.state_dict(),
             "scheduler_state": scheduler.state_dict(),
             "best_val_accuracy": best_val_accuracy,
+            "best_epoch": best_epoch,
+            "epochs_without_improvement": epochs_without_improvement,
             "history": history,
             "config": config,
+            "rng_state": capture_rng_state(),
         }
 
         torch.save(
@@ -256,20 +269,13 @@ def main():
             output_dir / "last_model.pt",
         )
 
-        if val_accuracy > best_val_accuracy:
-            best_val_accuracy = val_accuracy
-            best_epoch = epoch
-            epochs_without_improvement = 0
-
-            checkpoint["best_val_accuracy"] = best_val_accuracy
-
+        if improved:
             torch.save(
                 checkpoint,
                 output_dir / "best_model.pt",
             )
             print("  saved new best model")
-        else:
-            epochs_without_improvement += 1
+
 
         if epochs_without_improvement >= args.patience:
             print(
