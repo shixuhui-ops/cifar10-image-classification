@@ -31,6 +31,10 @@ def percentage(value):
     return f"{100 * value:.2f}%"
 
 
+def mean_std(mean, std):
+    return f"{percentage(mean)} ± {percentage(std)}"
+
+
 class Report:
     """固定五页排版，内容越界时停止，而不是生成额外页面。"""
 
@@ -144,7 +148,11 @@ class Report:
         c = self.document
         c.setFont(FONT_NAME, 8)
         c.setFillColor(colors.HexColor("#64748b"))
-        c.drawString(self.margin, 25, "图像分类模型设计与实验分析")
+        c.drawString(
+            self.margin,
+            25,
+            "图像分类模型设计与实验分析",
+        )
         c.drawRightString(
             self.page_width - self.margin,
             25,
@@ -157,7 +165,9 @@ class Report:
         _, height = paragraph.wrap(self.width, 10000)
         self.check_space(height)
         paragraph.drawOn(
-            self.document, self.margin, self.y - height
+            self.document,
+            self.margin,
+            self.y - height,
         )
         self.y -= height + gap
 
@@ -170,6 +180,7 @@ class Report:
             for weight in weights
         ]
         cells = []
+
         for row_index, row in enumerate(rows):
             style = self.styles[
                 "table_header" if row_index == 0 else "table"
@@ -179,29 +190,49 @@ class Report:
                 for value in row
             ])
 
-        table = Table(cells, colWidths=widths, hAlign="LEFT")
+        table = Table(
+            cells,
+            colWidths=widths,
+            hAlign="LEFT",
+        )
         commands = [
-            ("BACKGROUND", (0, 0), (-1, 0),
-             colors.HexColor("#243b53")),
+            (
+                "BACKGROUND",
+                (0, 0),
+                (-1, 0),
+                colors.HexColor("#243b53"),
+            ),
             ("VALIGN", (0, 0), (-1, -1), "TOP"),
-            ("GRID", (0, 0), (-1, -1), 0.35,
-             colors.HexColor("#cbd5e1")),
+            (
+                "GRID",
+                (0, 0),
+                (-1, -1),
+                0.35,
+                colors.HexColor("#cbd5e1"),
+            ),
             ("LEFTPADDING", (0, 0), (-1, -1), 6),
             ("RIGHTPADDING", (0, 0), (-1, -1), 6),
             ("TOPPADDING", (0, 0), (-1, -1), 4),
             ("BOTTOMPADDING", (0, 0), (-1, -1), 4),
         ]
+
         if highlight is not None:
             commands.append(
-                ("BACKGROUND", (0, highlight), (-1, highlight),
-                 colors.HexColor("#e0f2fe"))
+                (
+                    "BACKGROUND",
+                    (0, highlight),
+                    (-1, highlight),
+                    colors.HexColor("#e0f2fe"),
+                )
             )
 
         table.setStyle(TableStyle(commands))
         _, height = table.wrap(self.width, 10000)
         self.check_space(height)
         table.drawOn(
-            self.document, self.margin, self.y - height
+            self.document,
+            self.margin,
+            self.y - height,
         )
         self.y -= height + 8
 
@@ -227,7 +258,11 @@ class Report:
             mask="auto",
         )
         self.y -= height + 4
-        self.paragraph(escape(caption), "caption", gap=8)
+        self.paragraph(
+            escape(caption),
+            "caption",
+            gap=8,
+        )
 
     def save(self):
         self.finish_page()
@@ -255,28 +290,36 @@ def main():
 
     selected_name = summary["selected_experiment"]
     if selected_name != "resnet_no_se":
-        raise ValueError("当前报告模板对应已核对的 resnet_no_se 主模型。")
+        raise ValueError(
+            "当前报告模板对应已核对的 resnet_no_se 主模型。"
+        )
 
     main_result = experiments[selected_name]
     main_dir = ROOT / "outputs" / selected_name
     history = read_json(main_dir / "history.json")
-    class_report = read_json(main_dir / "classification_report.json")
-    class_names = read_json(main_dir / "config.json")["class_names"]
+    class_report = read_json(
+        main_dir / "classification_report.json"
+    )
+    class_names = read_json(
+        main_dir / "config.json"
+    )["class_names"]
+
     matrix = np.loadtxt(
         main_dir / "confusion_matrix.csv",
         delimiter=",",
         skiprows=1,
         dtype=int,
     )
-    cpu_env = read_json(REPORT_DIR / "environment_cpu.json")
-    gpu_env = read_json(REPORT_DIR / "environment_gpu.json")
+
+    cpu_env = read_json(
+        REPORT_DIR / "environment_cpu.json"
+    )
+    gpu_env = read_json(
+        REPORT_DIR / "environment_gpu.json"
+    )
 
     baseline = experiments["baseline_matched"]
-    se = experiments["resnet_se"]
-    noaug = experiments["resnet_se_noaug"]
-    nosmooth = experiments["resnet_se_no_smoothing"]
     transfer = experiments["resnet18_transfer"]
-    gpu_result = experiments["gpu_resnet_seed42"]
     multiseed = summary["multiseed_summary"]
 
     no_se_stats = multiseed["gpu_resnet_no_se"]
@@ -284,49 +327,62 @@ def main():
     no_smoothing_stats = multiseed[
         "gpu_resnet_se_no_smoothing"
     ]
-    wide_baseline_stats = multiseed["gpu_baseline_wide"]
+    wide_baseline_stats = multiseed[
+        "gpu_baseline_wide"
+    ]
 
-    augmentation_rows = {
-        row["augmentation_policy"]: row
-        for row in summary["experiments"]
-        if row["experiment"]
-        in {
-            "gpu_resnet_seed42",
-            "gpu_resnet_crop_seed42",
-            "gpu_resnet_flip_seed42",
-            "gpu_resnet_color_seed42",
-            "gpu_resnet_none_seed42",
-        }
+    statistics = read_json(
+        REPORT_DIR / "statistical_analysis.json"
+    )
+    group_stats = statistics["group_summary"]
+    paired = {
+        item["comparison"]: item
+        for item in statistics["paired_comparisons"]
     }
 
+    flops = read_json(
+        REPORT_DIR / "flops_summary.json"
+    )
+    flops_matched_stats = multiseed[
+        "gpu_baseline_flops_matched"
+    ]
+
     architecture_gain = (
-        main_result["test_accuracy"] - baseline["test_accuracy"]
+        main_result["test_accuracy"]
+        - baseline["test_accuracy"]
     ) * 100
-    augmentation_gain = (
-        se["test_accuracy"] - noaug["test_accuracy"]
-    ) * 100
-    smoothing_gain = (
-        se["test_accuracy"] - nosmooth["test_accuracy"]
-    ) * 100
-    attention_change = (
-        se["test_accuracy"] - main_result["test_accuracy"]
-    ) * 100
+
+    attention_test = paired[
+        "resnet_no_se - resnet_se"
+    ]
+    smoothing_test = paired[
+        "resnet_se_smoothing - resnet_se_no_smoothing"
+    ]
 
     report = Report(info)
 
     # ---------- 第 1 页：任务、数据和模型原理 ----------
     report.new_page()
-    report.paragraph(escape(info["title"]), "title", gap=9)
+    report.paragraph(
+        escape(info["title"]),
+        "title",
+        gap=9,
+    )
 
     identity = (
         f"姓名：{escape(info['author'])}"
         f"　学号：{escape(info['student_id'])}"
     )
     if info.get("class_name", "").strip():
-        identity += f"　班级：{escape(info['class_name'])}"
+        identity += (
+            f"　班级：{escape(info['class_name'])}"
+        )
     report.paragraph(identity, "small")
 
-    repository = escape(info["github_url"], {'"': "&quot;"})
+    repository = escape(
+        info["github_url"],
+        {'"': "&quot;"},
+    )
     report.paragraph(
         f'GitHub：<link href="{repository}" color="#1d4ed8">'
         f"{repository}</link>",
@@ -351,8 +407,10 @@ def main():
     report.paragraph(
         "CIFAR-10 [1] 包含 60,000 张 32×32 RGB 图像，分为飞机、汽车、"
         "鸟、猫、鹿、狗、青蛙、马、船和卡车十类。"
-        "将官方 50,000 张训练图像以 seed=42 随机划分为 "
-        "45,000 张训练集和 5,000 张验证集，保留官方 10,000 张测试集。"
+        "从官方 50,000 张训练图像中随机划分 45,000 张训练集和 "
+        "5,000 张验证集，保留官方 10,000 张测试集。CPU 原始实验使用 "
+        "seed=42；GPU 补充实验使用 seed=42、43、44。种子同时决定"
+        "训练/验证划分和训练随机性，同一 seed 的对照共享划分。"
         "验证集用于选轮次和模型，测试集用于结果汇报。"
     )
     report.paragraph(
@@ -393,7 +451,7 @@ def main():
                 "11.182 / 8.399",
             ],
         ],
-        [1.2, 5.4, 1.3],
+        [1.7, 4.8, 1.8],
     )
     report.paragraph(
         "残差连接 [2] 采用 y=ReLU(F(x)+S(x))，其中 S 在维度变化时使用 "
@@ -405,6 +463,13 @@ def main():
         "标签平滑 [4] 使用 q(k)=(1-ε)·I(k=y)+ε/10，"
         "默认 ε=0.1，并最小化 -Σq(k)log p(k)。"
         "其目的在于减弱对硬标签的过度拟合；是否有效由消融实验判断。"
+    )
+    report.paragraph(
+        "补充架构对照：加宽 CNN 使用 96/192/400 通道，每阶段两个 "
+        "3×3 Conv-BN-ReLU，阶段末为 MaxPool 和 Dropout2d，"
+        "GAP 后接 400→200→10 分类器。FLOPs 匹配 CNN 在首阶段额外"
+        "增加一个 96→96 卷积，其他结构与加宽 CNN 一致。",
+        "small",
     )
 
     # ---------- 第 2 页：训练设置与对比结果 ----------
@@ -425,12 +490,36 @@ def main():
     report.table(
         [
             ["设置", "从零训练正式实验", "预训练模型微调"],
-            ["优化器", "AdamW，weight decay=0.0005", "AdamW，weight decay=0.0005"],
-            ["学习率", "初始 0.001", "layer4：0.0001；分类层：0.001"],
-            ["训练预算", "最多 30 轮，batch size=128", "最多 15 轮，batch size=64"],
-            ["调度与早停", "余弦退火；耐心值 8", "余弦退火；耐心值 5"],
-            ["损失", "标签平滑交叉熵，ε=0.1", "标签平滑交叉熵，ε=0.1"],
-            ["数据/结构", "32×32；数据增强；BN、Dropout", "96×96；冻结前层及其 BN 统计"],
+            [
+                "优化器",
+                "AdamW，weight decay=0.0005",
+                "AdamW，weight decay=0.0005",
+            ],
+            [
+                "学习率",
+                "初始 0.001",
+                "layer4：0.0001；分类层：0.001",
+            ],
+            [
+                "训练预算",
+                "最多 30 轮，batch size=128",
+                "最多 15 轮，batch size=64",
+            ],
+            [
+                "调度与早停",
+                "余弦退火；耐心值 8",
+                "余弦退火；耐心值 5",
+            ],
+            [
+                "损失",
+                "标签平滑交叉熵，ε=0.1",
+                "标签平滑交叉熵，ε=0.1",
+            ],
+            [
+                "数据/结构",
+                "32×32；数据增强；BN、Dropout",
+                "96×96；冻结前层及其 BN 统计",
+            ],
         ],
         [1.2, 3.3, 3.3],
     )
@@ -452,7 +541,10 @@ def main():
         ("resnet18_transfer", "预训练 ResNet-18"),
         ("gpu_resnet_seed42", "无 SE：GPU 环境复现"),
     ]
-    rows = [["实验", "最佳轮次", "验证准确率", "测试准确率", "Macro F1"]]
+
+    rows = [
+        ["实验", "最佳轮次", "验证准确率", "测试准确率", "Macro F1"]
+    ]
     for key, label in labels:
         row = experiments[key]
         rows.append([
@@ -462,17 +554,27 @@ def main():
             percentage(row["test_accuracy"]),
             f"{row['macro_f1']:.4f}",
         ])
-    report.table(rows, [3.1, 1, 1.4, 1.4, 1.2], highlight=5)
+    report.table(
+        rows,
+        [3.1, 1, 1.4, 1.4, 1.2],
+        highlight=5,
+    )
 
     report.paragraph(
-        "补充：20 轮 CNN 初步实验验证/测试准确率为 88.22%/87.24%，"
-        "早停耐心值为 6；不用于正式架构对比。正式 CPU 主模型按最高验证"
+        "表中前六组为 CPU 实验，最后一组为 GPU 复现。"
+        "正式 CPU 主模型按最高验证"
         f"准确率 {percentage(main_result['best_val_accuracy'])} 选择，"
         f"不是按测试集最高值 {percentage(transfer['test_accuracy'])} 选择。",
         "small",
     )
 
-    report.heading("3.1　消融结论与比较边界")
+    report.heading("3.1　多随机种子结果与比较边界")
+    report.paragraph(
+        "以下三种子补充实验均在上述 GPU 环境中完成，"
+        "使用相同的主要训练设置。结果表示均值 ± 样本标准差（n=3），"
+        "准确率和标准差均以 % 表示。",
+        "small",
+    )
     report.paragraph(
         f"三随机种子结果显示，无 SE 残差网络为 "
         f"{percentage(no_se_stats['mean_test_accuracy'])}"
@@ -485,23 +587,57 @@ def main():
         " 个百分点，当前设置下未观察到稳定收益。"
         f"标签平滑相对无标签平滑平均提高 "
         f"{100 * (se_stats['mean_test_accuracy'] - no_smoothing_stats['mean_test_accuracy']):.2f}"
-        " 个百分点，提升幅度较小。"
+        " 个百分点，提升幅度较小。",
+        "small",
     )
     report.paragraph(
-        f"参数量匹配的加宽 CNN 有 "
-        f"{experiments['gpu_baseline_wide_seed42']['total_parameters']:,} "
-        "个参数，与无 SE 残差网络的参数量相差约 0.8%。"
-        f"三种子结果中，加宽 CNN 为 "
-        f"{percentage(wide_baseline_stats['mean_test_accuracy'])}"
-        f" ± {percentage(wide_baseline_stats['std_test_accuracy'])}，"
-        f"无 SE 残差网络为 "
-        f"{percentage(no_se_stats['mean_test_accuracy'])}"
-        f" ± {percentage(no_se_stats['std_test_accuracy'])}，"
-        f"残差网络平均高 "
-        f"{100 * (no_se_stats['mean_test_accuracy'] - wide_baseline_stats['mean_test_accuracy']):.2f}"
-        " 个百分点，说明差异不能仅由参数量解释。"
-        "迁移学习引入额外 ImageNet 数据且预算不同，只作为扩展实验。"
-        "不同标签平滑系数的 loss 不宜直接比较。",
+        "迁移学习引入额外 ImageNet 数据，且输入尺寸和训练预算不同，"
+        "只作为扩展实验。CPU 与 GPU 的软件版本不同，"
+        "不能将差异单独归因于硬件。不同标签平滑系数的 loss 不宜直接比较。",
+        "small",
+    )
+
+    report.heading("3.2　数据增强策略拆分")
+    rows = [
+        [
+            "增强策略",
+            "测试准确率（均值±SD）",
+            "相对无增强（百分点）",
+            "配对 p 值",
+        ]
+    ]
+
+    none_mean = group_stats["augmentation_none"]["mean"]
+
+    for policy, label in (
+        ("none", "无增强"),
+        ("crop", "RandomCrop"),
+        ("flip", "RandomHorizontalFlip"),
+        ("color", "ColorJitter"),
+    ):
+        item = group_stats[f"augmentation_{policy}"]
+
+        if policy == "none":
+            gain, p_value = "0.00", "—"
+        else:
+            test = paired[
+                f"augmentation_{policy} - augmentation_none"
+            ]
+            gain = f"{100 * (item['mean'] - none_mean):+.2f}"
+            p_value = f"{test['p_value']:.4f}"
+
+        rows.append([
+            label,
+            mean_std(item["mean"], item["std"]),
+            gain,
+            p_value,
+        ])
+
+    report.table(rows, [1.6, 2.1, 2.1, 1.0])
+    report.paragraph(
+        "各策略使用无 SE 残差网络及相同 seed 配对检验。"
+        "颜色扰动单独使用未观察到统计显著收益；"
+        "组合增强的三种子结果见上文无 SE 残差网络。",
         "small",
     )
 
@@ -510,11 +646,13 @@ def main():
     report.heading("4　训练过程与总体分类表现")
 
     best_record = next(
-        item for item in history
+        item
+        for item in history
         if item["epoch"] == main_result["best_epoch"]
     )
     accuracy_gap = 100 * (
-        best_record["train_accuracy"] - best_record["val_accuracy"]
+        best_record["train_accuracy"]
+        - best_record["val_accuracy"]
     )
 
     report.paragraph(
@@ -546,7 +684,7 @@ def main():
         f"{int(matrix.sum() - matrix.trace()):,} 张错误分类。"
         f"Macro F1={main_result['macro_f1']:.4f}。"
         "总体指标较高，但猫、狗和鸟等类别仍存在较多错误，"
-        "因此还需结合每类指标而非只报告一个总体准确率。",
+        "因此还需结合每类指标而非只报告一个总体准确率。"
     )
 
     # ---------- 第 4 页：每类指标和错误分析 ----------
@@ -558,7 +696,9 @@ def main():
         "small",
     )
 
-    rows = [["类别", "正确/总数", "Precision", "准确率/Recall", "F1"]]
+    rows = [
+        ["类别", "正确/总数", "Precision", "准确率/Recall", "F1"]
+    ]
     for index, name in enumerate(class_names):
         item = class_report[name]
         rows.append([
@@ -573,9 +713,12 @@ def main():
     cat_index = class_names.index("cat")
     dog_index = class_names.index("dog")
     cat_dog_errors = int(
-        matrix[cat_index, dog_index] + matrix[dog_index, cat_index]
+        matrix[cat_index, dog_index]
+        + matrix[dog_index, cat_index]
     )
-    all_errors = int(matrix.sum() - matrix.trace())
+    all_errors = int(
+        matrix.sum() - matrix.trace()
+    )
 
     report.paragraph(
         "汽车类别准确率最高（96.5%），猫最低（84.1%）。"
@@ -599,7 +742,7 @@ def main():
         "是否存在系统性校准问题，还需可靠性图或 ECE 等额外实验验证。"
     )
 
-    # ---------- 第 5 页：解释、反思、结论和参考文献 ----------
+    # ---------- 第 5 页：解释、对照、结论和参考文献 ----------
     report.new_page()
     report.heading("6　Grad-CAM 可解释性分析")
     report.paragraph(
@@ -610,7 +753,7 @@ def main():
     )
     report.figure(
         "gradcam_examples.png",
-        245,
+        220,
         "图4　左：原图；中：预测类别 Grad-CAM；右：真实类别 Grad-CAM。"
         "各热图单独归一化，颜色强弱不能跨类别直接比较。",
     )
@@ -622,41 +765,100 @@ def main():
         "small",
     )
 
-    report.heading("7　独立思考、局限与结论")
+    report.heading("7　补充架构对照、讨论与结论")
+    rows = [
+        ["GPU 架构", "参数量", "GFLOPs", "测试准确率（均值±SD）"]
+    ]
+
+    for label, model_key, item in (
+        ("无 SE 残差", "resnet", no_se_stats),
+        ("加宽 CNN", "baseline_wide", wide_baseline_stats),
+        (
+            "FLOPs 匹配 CNN",
+            "baseline_flops_matched",
+            flops_matched_stats,
+        ),
+    ):
+        model_cost = flops[model_key]
+        rows.append([
+            label,
+            f"{model_cost['trainable_parameters']:,}",
+            f"{model_cost['gflops']:.4f}",
+            mean_std(
+                item["mean_test_accuracy"],
+                item["std_test_accuracy"],
+            ),
+        ])
+
+    report.table(rows, [1.7, 1.5, 1.2, 2.7])
     report.paragraph(
-        "① 数据增强拆分实验显示，RandomCrop 和 "
-        "RandomHorizontalFlip 相对无增强分别提高约 2.94 和 2.86 个百分点，"
-        "ColorJitter 单独使用时没有显著收益。"
-        "② 三种子配对检验中，无 SE 相对 SE 平均提高 0.57 个百分点，"
-        "95% CI 为 [+0.20%, +0.94%]，p=0.0217；"
-        "标签平滑提升为 0.13 个百分点，p=0.2443。"
-        "③ 参数量和 FLOPs 接近时，CNN 与无 SE 残差网络的"
-        "三种子平均测试准确率分别为 90.90% 和 92.07%。"
-        "由于深度、池化和 Dropout 等仍有差异，"
-        "尚不能将性能优势单独归因于残差连接。"
-        "④ 已实现从 last_model.pt 恢复模型、优化器、调度器和训练历史，"
-        "但当前统计实验仍只有三个随机种子，结论应视为探索性证据。",
+        "结构见第 2 节；均使用三种子 GPU 实验。FLOPs 按 32×32 输入的 "
+        "Conv2d 和 Linear 乘加统计，一个乘加计 2 FLOPs。"
+        "深度、池化和 Dropout 等仍有差异，"
+        "尚不能将残差架构的性能优势单独归因于残差连接。",
+        "small",
+    )
+    report.paragraph(
+        f"按相同 seed 配对 t 检验：无 SE 相对 SE 提高 "
+        f"{100 * attention_test['mean_difference']:.2f} 个百分点，"
+        "差值的 95% CI 为 "
+        f"[{100 * attention_test['difference_ci95_low']:+.2f}, "
+        f"{100 * attention_test['difference_ci95_high']:+.2f}] 个百分点，"
+        f"p={attention_test['p_value']:.4f}；"
+        f"标签平滑提高 {100 * smoothing_test['mean_difference']:.2f} "
+        f"个百分点，p={smoothing_test['p_value']:.4f}。"
+        "每组仅三个种子，p 值未做多重比较校正，结果仅作探索性证据。",
+        "small",
+    )
+    report.paragraph(
+        "恢复训练已支持模型、优化器、调度器、历史及随机状态恢复。"
+        "当前 GPU 环境的两轮、小批次测试中，连续训练与断点续训的"
+        "模型参数、优化器、调度器、随机状态和训练历史（不含耗时）"
+        "完全一致；该验证不保证跨设备或跨版本逐位一致。",
         "small",
     )
     report.paragraph(
         f"结论：按验证集选择的无 SE 残差网络达到 "
         f"{percentage(main_result['test_accuracy'])} 测试准确率，"
         f"相对正式 CNN 对照提高 {architecture_gain:.2f} 个百分点。"
-        "完整代码、README、原始指标、图表及环境记录提供了可核查的实验链路。",
+        "代码、原始指标、图表、环境记录和 README 提供了可核查的实验链路。",
         "small",
     )
 
     report.heading("参考文献")
     references = [
-        "[1] Krizhevsky A. Learning Multiple Layers of Features from Tiny Images. 2009.",
-        "[2] He K, et al. Deep Residual Learning for Image Recognition. CVPR, 2016.",
-        "[3] Hu J, et al. Squeeze-and-Excitation Networks. CVPR, 2018.",
-        "[4] Szegedy C, et al. Rethinking the Inception Architecture for Computer Vision. CVPR, 2016.",
-        "[5] Selvaraju R R, et al. Grad-CAM: Visual Explanations from Deep Networks via Gradient-based Localization. ICCV, 2017.",
-        "[6] Loshchilov I, Hutter F. Decoupled Weight Decay Regularization. ICLR, 2019.",
+        (
+            "[1] Krizhevsky A. Learning Multiple Layers of Features "
+            "from Tiny Images. 2009."
+        ),
+        (
+            "[2] He K, et al. Deep Residual Learning for "
+            "Image Recognition. CVPR, 2016."
+        ),
+        (
+            "[3] Hu J, et al. Squeeze-and-Excitation Networks. "
+            "CVPR, 2018."
+        ),
+        (
+            "[4] Szegedy C, et al. Rethinking the Inception "
+            "Architecture for Computer Vision. CVPR, 2016."
+        ),
+        (
+            "[5] Selvaraju R R, et al. Grad-CAM: Visual Explanations "
+            "from Deep Networks via Gradient-based Localization. "
+            "ICCV, 2017."
+        ),
+        (
+            "[6] Loshchilov I, Hutter F. Decoupled Weight Decay "
+            "Regularization. ICLR, 2019."
+        ),
     ]
     for reference in references:
-        report.paragraph(escape(reference), "caption", gap=3)
+        report.paragraph(
+            escape(reference),
+            "caption",
+            gap=3,
+        )
 
     report.save()
 
